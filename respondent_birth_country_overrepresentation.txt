@@ -1,4 +1,4 @@
-Country of birth|percentage of suspects|over representation
+country of birth|percentage of suspects|over representation
 Nordic countries except Sweden|4.7|1.4
 EU15 Excluding Denmark, Finland, Sweden|1.2|1.1
 New EU 10 countries|1.6|1.8
