@@ -1,5 +1,0 @@
-|percentage of suspects|over representation
-Both parents were born in Sweden|58.9|0.8
-One parent born in Sweden|10.4|1.1
-Both parents born abroad|5.2|1.6
-Respondent born abroad|25.6|2.0

@@ -1,9 +1,0 @@
-type of crime|both parents born in Sweden|one parent born in sweden|both parents foreign born|foreign born
-crimes against persons|21|19|20|29
-theft|26|28|27|24
-fraud|11|10|10|10
-damage|4|4|4|3
-driving offenses|19|19|19|15
-drug offenses|4|5|5|4
-other crimes|15|14|14|15
-number of violations|880525|187127|100847|348138
