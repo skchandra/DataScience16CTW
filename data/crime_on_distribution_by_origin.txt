@@ -1,0 +1,24 @@
+type of crime|born in Sweden with Swedish-born parents|immigrant children|foreign born
+crimes against life and health|1.40|2.50|4.10
+lethal violence and attempted murder and manslaughter|0.04|0.09|0.15
+aggravated assault|1.40|2.40|4.10
+crimes against freedom and peace|1.10|1.90|3.40
+trespassing|0.25|0.46|0.50
+unlawful threats|0.70|1.40|2.70
+molestation|0.32|0.54|0.89
+sexual crimes|0.15|0.23|0.49
+rape / attempted rape|0.04|0.08|0.22
+theft, robbery, and other acquisitive crime|1.50|2.80|4.20
+robbery|0.09|0.28|0.35
+theft of car|0.29|0.63|0.43
+burglary of residence|0.10|0.20|0.16
+theft in stores|0.70|1.30|2.70
+fraud, embezzlement, breach of trust|1.00|1.70|2.50
+vandalism|0.60|1.10|1.00
+counterfeiting|0.17|0.30|0.42
+violence against officials and violent resistance|0.44|0.90|1.30
+breach of weapons law|0.17|0.39|0.35
+breach of the law on the prohibition of knives|0.22|0.51|0.45
+traffic offense act except drunk driving|0.70|1.30|1.90
+drunk driving|0.80|1.20|1.10
+crimes against drug criminals law|0.50|1.10|1.00

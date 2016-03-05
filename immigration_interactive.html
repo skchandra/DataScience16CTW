@@ -1,0 +1,127 @@
+<html>
+<head>
+  <title>Interactive Swedish Immigration Statistics</title>
+  <style>
+    .bar {
+      fill: teal;
+    }
+
+    .bar:hover {
+      fill: brown;
+    }
+    
+    svg .bartext {
+      font: 10px sans-serif;
+      color: blue;
+    }
+
+    .axis {
+      font: 10px sans-serif;
+    }
+    
+    .axis .label {
+      font: 15px sans-serif;
+    }
+
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+    
+    .y.axis .tick line {
+      display: none;
+    }
+
+    .y.axis path {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src="http://d3js.org/topojson.v0.min.js"></script>
+  <script type="text/javascript">
+    var outerWidth = 750;
+    var outerHeight = 500;
+    var margin = {top: 20, right: 30, bottom: 30, left: 275};
+    var innerWidth = outerWidth - margin.left - margin.right;
+    var innerHeight = outerHeight - margin.top - margin.bottom;
+
+    var x = d3.scale.linear()
+      .range([0, innerWidth]);
+
+    var y = d3.scale.ordinal()
+      .rangeRoundBands([0, innerHeight], .25);
+
+    var xAxis = d3.svg.axis()
+      .scale(x)
+      .orient("bottom")
+      .ticks(10);
+
+    var yAxis = d3.svg.axis()
+      .scale(y)
+      .orient("left");
+    
+    var svg = d3.select("body").append("svg")
+      .attr("width", outerWidth)
+      .attr("height", outerHeight)
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    
+    function render (data) {
+      x.domain([0, d3.max(data, function (d) { return d["percentage of suspects"] })]);
+      y.domain(data.map( function (d) { return d["country of birth"]; }));
+      
+      svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + innerHeight + ")")
+        .call(xAxis);
+      
+      svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+        .append("text")
+        .attr("class", "y axis label")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -innerHeight/2)
+        .attr("y", -margin.left/2)
+        .style("text-anchor", "middle")
+        .text("Country of Birth");
+      
+      var bars = svg.selectAll(".bar").data(data);
+      bars.enter().append("rect")
+        .attr("class", "bar")
+        .attr("x", 0)
+        .attr("height", 20);
+      bars
+        .attr("width", function (d) { return x(d["percentage of suspects"]); })
+        .attr("y", function (d) { return y(d["country of birth"]); });
+      
+      var bartext = svg.selectAll(".bartext").data(data);
+      bartext.enter().append("text")
+        .attr("class", "bartext")
+        .attr("x", 5)
+        .attr("y", 15);
+      bartext
+        .text( function (d) { return d["percentage of suspects"]; })
+        .attr("transform", function (d) {
+          return "translate("+ x(d["percentage of suspects"]) + ","
+            + y(d["country of birth"]) + ")";
+        });
+    }
+    
+    function type (d) {
+      d["percentage of suspects"] = +d["percentage of suspects"];
+      return d;
+    }
+        
+    var parser = d3.dsv("|", "text/plain");
+    parser("./respondent_birth_country_overrepresentation.txt", type, function (err, data) {
+      if (err) throw err;
+      render(data);
+    });
+  </script>
+</body>
+</html>
