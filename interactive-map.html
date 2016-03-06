@@ -2,28 +2,54 @@
 <head>
   <title>Interactive Map</title>
   <style>
-    /* For map */
-    path {
+    .country path {
       stroke: white;
       stroke-width: 0.5px;
       fill: black;
     }
     
-    #32 {
-      fill: red;
-    }
-    
     .country {
       fill: #ccc;
       stroke: #fff;
-      stroke-width: .5px;
+      stroke-width: 0.5px;
       stroke-linejoin: round;
     }
     
-    path[title="Afghanistan"] {
-      fill: black;
+    .bar {
+      fill: teal;
     }
 
+    .bar:hover {
+      fill: brown;
+    }
+    
+    svg .bartext {
+      font: 10px sans-serif;
+      color: blue;
+    }
+
+    .axis {
+      font: 10px sans-serif;
+    }
+    
+    .axis .label {
+      font: 15px sans-serif;
+    }
+
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+    
+    .y.axis .tick line {
+      display: none;
+    }
+
+    .y.axis path {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -43,26 +69,66 @@
     var path = d3.geo.path()
       .projection(projection);
 
-    var svg = d3.select(".map").append("svg")
+    var svg2 = d3.select(".map").append("svg")
       .attr("width", width)
       .attr("height", height)
       .attr("class", "map");
     
-    var g = svg.append("g");
+    var g = svg2.append("g");
+    
+    var NorthAfrica = [
+      "Algeria",
+      "Egypt",
+      "Libya",
+      "Morocco",
+      "Sudan",
+      "Tunisia",
+      "Western Sahara"
+    ];
+    
+    // Bar charts
+    var outerWidth = 750;
+    var outerHeight = 500;
+    var margin = {top: 20, right: 30, bottom: 30, left: 275};
+    var innerWidth = outerWidth - margin.left - margin.right;
+    var innerHeight = outerHeight - margin.top - margin.bottom;
+
+    var x = d3.scale.linear()
+      .range([0, innerWidth]);
+
+    var y = d3.scale.ordinal()
+      .rangeRoundBands([0, innerHeight], .25);
+
+    var xAxis = d3.svg.axis()
+      .scale(x)
+      .orient("bottom")
+      .ticks(10);
+
+    var yAxis = d3.svg.axis()
+      .scale(y)
+      .orient("left");
+    
+    var svg = d3.select("body").append("svg")
+      .attr("width", outerWidth)
+      .attr("height", outerHeight)
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     
     /*queue()
       .defer(d3.json, "./data/world-110m2.json")
       .defer(d3.tsv, "./data/world-country-names.tsv")
       .await(ready);*/
     
+    var psv = d3.dsv("|", "text/plain");
+    
     queue()
       .defer(d3.json, "https://raw.githubusercontent.com/mbostock/topojson/master/examples/world-110m.json")
       .defer(d3.tsv, "https://raw.githubusercontent.com/KoGor/Maps.GeoInfo/master/world-country-names.tsv")
+      .defer(psv, "https://raw.githubusercontent.com/skchandra/DataScience16CTW/master/data/respondent_birth_country_overrepresentation.txt")
       .await(ready);
     
-    function ready (error, world, names) {
+    function ready (error, world, names, overrepresentation) {
       var countries = topojson.object(world, world.objects.countries).geometries;
-      //var neighbors = topojson.neighbors(world, countries);
       var i = -1;
       var n = countries.length;
 
@@ -73,14 +139,87 @@
         }
       });
       
-      var country = svg.selectAll(".country").data(countries);
+      var country = svg2.selectAll(".country").data(countries);
       country.enter()
         .insert("path")
-        //.append("path")
         .attr("class", "country")
         .attr("title", function(d,i) { return d.name; })
         .attr("d", path);
+      
+      render(overrepresentation);
     }
+    
+    function highlight(countryNames) {
+      countryNames.forEach(function(d) {
+        d3.select("path[title=\"" + d + "\"]")
+          .attr("style", "fill: black");
+      });
+    }
+    
+    function unhighlight(countryNames) {
+      countryNames.forEach(function(d) {
+        d3.select("path[title=\"" + d + "\"]")
+          .attr("style", "fill: #ccc");
+      });
+    }
+    
+    function render (data) {
+      // Renders the bar charts
+      x.domain([0, d3.max(data, function (d) { return d["percentage of suspects"] })]);
+      y.domain(data.map( function (d) { return d["country of birth"]; }));
+      
+      svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + innerHeight + ")")
+        .call(xAxis);
+      
+      svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+        .append("text")
+        .attr("class", "y axis label")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -innerHeight/2)
+        .attr("y", -margin.left/2)
+        .style("text-anchor", "middle")
+        .text("Country of Birth");
+      
+      var bars = svg.selectAll(".bar").data(data);
+      bars.enter().append("rect")
+        .attr("class", "bar")
+        .attr("x", 0)
+        .attr("height", 20)
+        .attr("onmouseover", "highlight(NorthAfrica)")
+        .attr("onmouseout", "unhighlight(NorthAfrica)");
+      bars
+        .attr("width", function (d) { return x(d["percentage of suspects"]); })
+        .attr("y", function (d) { return y(d["country of birth"]); });
+      
+      var bartext = svg.selectAll(".bartext").data(data);
+      bartext.enter().append("text")
+        .attr("class", "bartext")
+        .attr("x", 5)
+        .attr("y", 15);
+      bartext
+        .text( function (d) { return d["percentage of suspects"]; })
+        .attr("transform", function (d) {
+          return "translate("+ x(d["percentage of suspects"]) + ","
+            + y(d["country of birth"]) + ")";
+        });
+    }
+    
+    function type (d) {
+      d["percentage of suspects"] = +d["percentage of suspects"];
+      return d;
+    }
+        
+    /*var parser = d3.dsv("|", "text/plain");
+    parser("./respondent_birth_country_overrepresentation.txt", type, function (err, data) {
+      if (err) throw err;
+      render(data);
+    });*/
+        
   </script>
+  <a onmouseover="highlight(NorthAfrica)" onmouseout="unhighlight(NorthAfrica)">North Africa</a>
 </body>
 </html>
