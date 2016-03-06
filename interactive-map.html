@@ -125,9 +125,10 @@
       .defer(d3.json, "https://raw.githubusercontent.com/mbostock/topojson/master/examples/world-110m.json")
       .defer(d3.tsv, "https://raw.githubusercontent.com/KoGor/Maps.GeoInfo/master/world-country-names.tsv")
       .defer(psv, "https://raw.githubusercontent.com/skchandra/DataScience16CTW/master/data/respondent_birth_country_overrepresentation.txt")
+      .defer(d3.json, "https://raw.githubusercontent.com/skchandra/DataScience16CTW/master/data/region_country_mapping.json")
       .await(ready);
     
-    function ready (error, world, names, overrepresentation) {
+    function ready (error, world, names, overrepresentation, regionMappings) {
       var countries = topojson.object(world, world.objects.countries).geometries;
       var i = -1;
       var n = countries.length;
@@ -146,6 +147,53 @@
         .attr("title", function(d,i) { return d.name; })
         .attr("d", path);
       
+      render = function (data) {
+        // Renders the bar charts
+        x.domain([0, d3.max(data, function (d) { return d["percentage of suspects"] })]);
+        y.domain(data.map( function (d) { return d["country of birth"]; }));
+
+        svg.append("g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(0," + innerHeight + ")")
+          .call(xAxis);
+
+        svg.append("g")
+          .attr("class", "y axis")
+          .call(yAxis)
+          .append("text")
+          .attr("class", "y axis label")
+          .attr("transform", "rotate(-90)")
+          .attr("x", -innerHeight/2)
+          .attr("y", -margin.left/2)
+          .style("text-anchor", "middle")
+          .text("Country of Birth");
+
+        var bars = svg.selectAll(".bar").data(data);
+        bars.enter().append("rect")
+          .attr("class", "bar")
+          .attr("x", 0)
+          .attr("height", 20);
+        bars
+          .attr("width", function (d) { return x(d["percentage of suspects"]); })
+          .attr("y", function (d) { return y(d["country of birth"]); })
+          .attr("onmouseover", function (d) {
+          return 'highlight([\"' + String(regionMappings[d["country of birth"]]).replace(/,/g, "\",\"") + '\"])'; })
+          .attr("onmouseout", function (d) {
+            return 'unhighlight([\"' + String(regionMappings[d["country of birth"]]).replace(/,/g, "\",\"") + '\"])';
+        });
+
+        var bartext = svg.selectAll(".bartext").data(data);
+        bartext.enter().append("text")
+          .attr("class", "bartext")
+          .attr("x", 5)
+          .attr("y", 15);
+        bartext
+          .text( function (d) { return d["percentage of suspects"]; })
+          .attr("transform", function (d) {
+            return "translate("+ x(d["percentage of suspects"]) + ","
+              + y(d["country of birth"]) + ")";
+          });
+      }
       render(overrepresentation);
     }
     
@@ -161,51 +209,6 @@
         d3.select("path[title=\"" + d + "\"]")
           .attr("style", "fill: #ccc");
       });
-    }
-    
-    function render (data) {
-      // Renders the bar charts
-      x.domain([0, d3.max(data, function (d) { return d["percentage of suspects"] })]);
-      y.domain(data.map( function (d) { return d["country of birth"]; }));
-      
-      svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + innerHeight + ")")
-        .call(xAxis);
-      
-      svg.append("g")
-        .attr("class", "y axis")
-        .call(yAxis)
-        .append("text")
-        .attr("class", "y axis label")
-        .attr("transform", "rotate(-90)")
-        .attr("x", -innerHeight/2)
-        .attr("y", -margin.left/2)
-        .style("text-anchor", "middle")
-        .text("Country of Birth");
-      
-      var bars = svg.selectAll(".bar").data(data);
-      bars.enter().append("rect")
-        .attr("class", "bar")
-        .attr("x", 0)
-        .attr("height", 20)
-        .attr("onmouseover", "highlight(NorthAfrica)")
-        .attr("onmouseout", "unhighlight(NorthAfrica)");
-      bars
-        .attr("width", function (d) { return x(d["percentage of suspects"]); })
-        .attr("y", function (d) { return y(d["country of birth"]); });
-      
-      var bartext = svg.selectAll(".bartext").data(data);
-      bartext.enter().append("text")
-        .attr("class", "bartext")
-        .attr("x", 5)
-        .attr("y", 15);
-      bartext
-        .text( function (d) { return d["percentage of suspects"]; })
-        .attr("transform", function (d) {
-          return "translate("+ x(d["percentage of suspects"]) + ","
-            + y(d["country of birth"]) + ")";
-        });
     }
     
     function type (d) {
