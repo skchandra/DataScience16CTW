@@ -28,8 +28,12 @@ groupedBar = function() {
       .attr("height", height + margin.top + margin.bottom)
     .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-  d3.csv("data.csv", function(error, data) {
+  
+  queue()
+    .defer(d3.csv, "https://raw.githubusercontent.com/skchandra/DataScience16CTW/master/data.csv")
+    .await(ready);
+  
+  function ready(error, data) {
     if (error) throw error;
 
     var ageNames = d3.keys(data[0]).filter(function(key) { return key !== "State"; });
@@ -90,5 +94,5 @@ groupedBar = function() {
         .attr("dy", ".35em")
         .style("text-anchor", "end")
         .text(function(d) { return d; });
-  });
+  }
 }
