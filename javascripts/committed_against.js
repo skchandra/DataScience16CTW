@@ -12,7 +12,8 @@ committedAgainstGroupedBar = function() {
   var y1 = d3.scale.ordinal();
 
   var color = d3.scale.ordinal()
-      .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+    .range(["#006BA6", "#0496FF", "FFBC42", "#D81159", "#8F2D56"]);
+      //.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
 
   var xAxis = d3.svg.axis()
       .scale(x)
@@ -21,7 +22,6 @@ committedAgainstGroupedBar = function() {
   var yAxis = d3.svg.axis()
       .scale(y0)
       .orient("left");
-      //.tickFormat(d3.format(".2s"));
 
   var svg = d3.select(".crimesAgainst").append("svg")
       .attr("width", width + margin.left + margin.right)

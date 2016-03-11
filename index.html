@@ -7,64 +7,7 @@
     <meta name="description" content="Sexual Assault and Immigration in Sweden : In an exploration of data visualization and data analysis, we hope to elucidate the meaning of the data behind the recent relation behind sexual assault and immigration in Sweden.">
 
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-    
-  <style>
-    .highlight {
-      fill: rgba(204, 204, 204, .2);
-      stroke: #ccc;
-    }
-    
-    .country {
-      fill: #ccc;
-      stroke: #fff;
-      stroke-width: 0.5px;
-      stroke-linejoin: round;
-    }
-    
-    .left .bar {
-      fill: teal;
-    }
-    
-    .right .bar {
-      fill: cyan;
-    }
-
-    .bar:hover {
-      fill: brown;
-    }
-    
-    svg .bartext {
-      font: 10px sans-serif;
-      color: blue;
-    }
-
-    .axis {
-      font: 10px sans-serif;
-    }
-    
-    .axis .label {
-      font: 15px sans-serif;
-    }
-
-    .axis path,
-    .axis line {
-      fill: none;
-      stroke: #000;
-      shape-rendering: crispEdges;
-    }
-    
-    .y.axis .tick line {
-      display: none;
-    }
-
-    .y.axis path {
-      display: none;
-    }
-    
-    text .regionName {
-      font: 15px sans-serif;
-    }
-  </style>
+    <link rel="stylesheet" type="text/css" href="stylesheets/horz-bar.css">
     
     <script type="text/javascript" src="https://www.amcharts.com/lib/3/ammap.js"></script>
     <script type="text/javascript" src="https://www.amcharts.com/lib/3/maps/js/swedenLow.js"></script>
@@ -118,35 +61,10 @@
         <iframe width="900" height="800" frameborder="0" scrolling="no" src="https://plot.ly/~skchandra/613.embed"></iframe>
       </section>
       
-    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
   <script src="http://d3js.org/topojson.v0.min.js"></script>
   <script src="https://d3js.org/d3-queue.v2.min.js"></script>
-  <script type="text/javascript">
-    var queue = d3_queue.queue;
-    
-    function highlight(countryNames, regionName) {
-      d3.selectAll("text").filter(".regionName")
-        .text(regionName);
-      countryNames.forEach(function(d) {
-        d3.select("path[title=\"" + d + "\"]")
-          .attr("class", "highlight");
-      });
-    }
-    
-    function unhighlight(countryNames) {
-      d3.selectAll("text").filter(".regionName")
-        .text("");
-      countryNames.forEach(function(d) {
-        d3.select("path[title=\"" + d + "\"]")
-          .attr("class", "country");
-      });
-    }
-    
-    function type (d) {
-      d["percentage of suspects"] = +d["percentage of suspects"];
-      return d;
-    }
-  </script>
+  <script src="javascripts/d3_helpers.js"></script>
   <script src="javascripts/committed_against.js"></script>
   <script src="javascripts/committed_by.js"></script>
   <script src="javascripts/map_visualizer.js"></script>

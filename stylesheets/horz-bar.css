@@ -1,0 +1,58 @@
+/* Color scheme
+        "#006BA6", "#0496FF", "FFBC42", "#D81159", "#8F2D56"
+*/
+.highlight {
+  fill: rgba(204, 204, 204, .2);
+  stroke: #ccc;
+}
+
+.country {
+  fill: #ccc;
+  stroke: #fff;
+  stroke-width: 0.5px;
+  stroke-linejoin: round;
+}
+
+.left .bar {
+  fill: #006BA6;
+}
+
+.right .bar {
+  fill: #0496FF;
+}
+
+.bar:hover {
+  fill: brown;
+}
+
+svg .bartext {
+  font: 10px sans-serif;
+  color: blue;
+}
+
+.axis {
+  font: 10px sans-serif;
+}
+
+.axis .label {
+  font: 15px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.y.axis .tick line {
+  display: none;
+}
+
+.y.axis path {
+  display: none;
+}
+
+text .regionName {
+  font: 15px sans-serif;
+}

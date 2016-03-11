@@ -6,6 +6,7 @@ var overrepBar = function() {
   var innerMargin = {top: 0, right: 0, bottom: 50, left: 0};
   var innerWidth = outerWidth - margin.left - margin.right;
   var innerHeight = outerHeight - margin.top - margin.bottom;
+  var colors = ["#006BA6", "#0496FF", "FFBC42", "#D81159", "#8F2D56"];
 
   var svg = d3.select(".overrep").append("svg")
     .attr("class", "horzbar")
