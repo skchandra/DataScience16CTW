@@ -3,7 +3,8 @@
   <title>Interactive Map</title>
   <style>
     .highlight {
-      fill: brown;
+      fill: rgba(204, 204, 204, .2);
+      stroke: #ccc;
     }
     
     .country {
@@ -13,8 +14,12 @@
       stroke-linejoin: round;
     }
     
-    .bar {
+    .left .bar {
       fill: teal;
+    }
+    
+    .right .bar {
+      fill: cyan;
     }
 
     .bar:hover {
@@ -48,6 +53,10 @@
     .y.axis path {
       display: none;
     }
+    
+    text .regionName {
+      font: 15px sans-serif;
+    }
   </style>
 </head>
 <body>
@@ -57,41 +66,6 @@
   <script src="https://d3js.org/d3-queue.v2.min.js"></script>
   <script type="text/javascript">
     var queue = d3_queue.queue;
-    
-    // Bar charts
-    var outerWidth = 750;
-    var outerHeight = 500;
-    var margin = {top: 20, right: 30, bottom: 50, left: 275};
-    var innerWidth = outerWidth - margin.left - margin.right;
-    var innerHeight = outerHeight - margin.top - margin.bottom;
-
-    var x = d3.scale.linear()
-      .range([0, innerWidth]);
-
-    var y = d3.scale.ordinal()
-      .rangeRoundBands([0, innerHeight], .25);
-
-    var xAxis = d3.svg.axis()
-      .scale(x)
-      .orient("bottom")
-      .ticks(10);
-
-    var yAxis = d3.svg.axis()
-      .scale(y)
-      .orient("left");
-    
-    var svg = d3.select("body").append("svg")
-      .attr("width", outerWidth)
-      .attr("height", outerHeight)
-      .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    
-    var svgOverrep = d3.select("body").append("svg")
-      .attr("width", outerWidth)
-      .attr("height", outerHeight)
-      .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    
     /*queue()
       .defer(d3.json, "./data/world-110m2.json")
       .defer(d3.tsv, "./data/world-country-names.tsv")
@@ -99,130 +73,9 @@
     
     var psv = d3.dsv("|", "text/plain");
     
-    queue()
-      .defer(psv, "https://raw.githubusercontent.com/skchandra/DataScience16CTW/master/data/respondent_birth_country_overrepresentation.txt")
-      .defer(d3.json, "https://raw.githubusercontent.com/skchandra/DataScience16CTW/master/data/region_country_mapping.json")
-      .await(ready);
-    
-    function ready (error, overrepresentation, regionMappings) {
-      render = function (data) {
-        // Renders the bar charts
-        x.domain([0, d3.max(data, function (d) { return d["percentage of suspects"] })]);
-        y.domain(data.map( function (d) { return d["country of birth"]; }));
-
-        svg.append("g")
-          .attr("class", "x axis")
-          .attr("transform", "translate(0," + innerHeight + ")")
-          .call(xAxis)
-          .append("text")
-          .attr("class", "x axis label")
-          .attr("x", innerWidth/2)
-          .attr("y", 40)
-          .style("text-anchor", "middle")
-          .text("Percentage of Suspects");
-
-        svg.append("g")
-          .attr("class", "y axis")
-          .call(yAxis)
-          .append("text")
-          .attr("class", "y axis label")
-          .attr("transform", "rotate(-90)")
-          .attr("x", -innerHeight/2)
-          .attr("y", -margin.left/2)
-          .style("text-anchor", "middle")
-          .text("Country of Birth");
-
-        var bars = svg.selectAll(".bar").data(data);
-        bars.enter().append("rect")
-          .attr("class", "bar")
-          .attr("x", 0)
-          .attr("height", 20);
-        bars
-          .attr("width", function (d) { return x(d["percentage of suspects"]); })
-          .attr("y", function (d) { return y(d["country of birth"]); })
-          .attr("onmouseover", function (d) {
-            return 'highlight([\"' +
-              String(regionMappings[d["country of birth"]])
-                .replace(/,/g, "\",\"") + '\"])'; })
-          .attr("onmouseout", function (d) {
-            return 'unhighlight([\"' +
-              String(regionMappings[d["country of birth"]])
-                .replace(/,/g, "\",\"") + '\"])'; });
-
-        var bartext = svg.selectAll(".bartext").data(data);
-        bartext.enter().append("text")
-          .attr("class", "bartext")
-          .attr("x", 5)
-          .attr("y", 15);
-        bartext
-          .text( function (d) { return d["percentage of suspects"]; })
-          .attr("transform", function (d) {
-            return "translate("+ x(d["percentage of suspects"]) + ","
-              + y(d["country of birth"]) + ")";
-          });
-      }
-      
-      renderOverrep = function (data) {
-        // Renders the bar charts
-        x.domain([0, d3.max(data, function (d) { return d["over representation"] })]);
-        y.domain(data.map( function (d) { return d["country of birth"]; }));
-
-        svgOverrep.append("g")
-          .attr("class", "x axis")
-          .attr("transform", "translate(0," + innerHeight + ")")
-          .call(xAxis)
-          .append("text")
-          .attr("class", "x axis label")
-          .attr("x", innerWidth/2)
-          .attr("y", 40)
-          .style("text-anchor", "middle")
-          .text("Over Representation");
-
-        svgOverrep.append("g")
-          .attr("class", "y axis")
-          .call(yAxis)
-          .append("text")
-          .attr("class", "y axis label")
-          .attr("transform", "rotate(-90)")
-          .attr("x", -innerHeight/2)
-          .attr("y", -margin.left/2)
-          .style("text-anchor", "middle")
-          .text("Country of Birth");
-
-        var bars = svgOverrep.selectAll(".bar").data(data);
-        bars.enter().append("rect")
-          .attr("class", "bar")
-          .attr("x", 0)
-          .attr("height", 20);
-        bars
-          .attr("width", function (d) { return x(d["over representation"]); })
-          .attr("y", function (d) { return y(d["country of birth"]); })
-          .attr("onmouseover", function (d) {
-            return 'highlight([\"' +
-              String(regionMappings[d["country of birth"]])
-                .replace(/,/g, "\",\"") + '\"])'; })
-          .attr("onmouseout", function (d) {
-            return 'unhighlight([\"' +
-              String(regionMappings[d["country of birth"]])
-                .replace(/,/g, "\",\"") + '\"])'; });
-
-        var bartext = svgOverrep.selectAll(".bartext").data(data);
-        bartext.enter().append("text")
-          .attr("class", "bartext")
-          .attr("x", 5)
-          .attr("y", 15);
-        bartext
-          .text( function (d) { return d["over representation"]; })
-          .attr("transform", function (d) {
-            return "translate("+ x(d["over representation"]) + ","
-              + y(d["country of birth"]) + ")";
-          });
-      }
-      render(overrepresentation);
-      renderOverrep(overrepresentation);
-    }
-    
-    function highlight(countryNames) {
+    function highlight(countryNames, regionName) {
+      d3.selectAll("text").filter(".regionName")
+        .text(regionName);
       countryNames.forEach(function(d) {
         d3.select("path[title=\"" + d + "\"]")
           .attr("class", "highlight");
@@ -230,6 +83,8 @@
     }
     
     function unhighlight(countryNames) {
+      d3.selectAll("text").filter(".regionName")
+        .text("");
       countryNames.forEach(function(d) {
         d3.select("path[title=\"" + d + "\"]")
           .attr("class", "country");
@@ -241,11 +96,15 @@
       return d;
     }
   </script>
-  <script src="grouped_bar.js"></script>
+  <script src="committed_against.js"></script>
+  <script src="committed_by.js"></script>
   <script src="map_visualilzer.js"></script>
+  <script src="horz_bar.js"></script>
   <script type="text/javascript">
     mapVisualization();
-    groupedBar();
+    overrepBar();
+    committedAgainstGroupedBar();
+    committedByGroupedBar();
   </script>
 </body>
 </html>

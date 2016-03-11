@@ -39,5 +39,12 @@ var mapVisualization = function() {
       .attr("class", "country")
       .attr("title", function(d,i) { return d.name; })
       .attr("d", path);
+    
+    svg.append("text")
+    .attr("class", "regionName")
+    .attr("text-anchor", "end")
+    .attr("x", width)
+    .attr("y", height-30)
+    .text("what");
   }
 }
